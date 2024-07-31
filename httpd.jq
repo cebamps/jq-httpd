@@ -1,4 +1,4 @@
-#!/usr/bin/env -S jq -Rrnf --rawfile self httpd.jq
+#!/usr/bin/env -S jq -Rrn --rawfile self httpd.jq -f
 
 def next_phase: .phase |= {
   "verb": "header",
