@@ -39,7 +39,7 @@ def response(code; reason; headers; body):
   (headers | to_entries[] | [.key, .value] | join(": ")),
   "",
   body
-  | sub("$"; "\r")
+  | . + "\r"
 ;
 
 def html(code; reason; body): response(code; reason; {"content-type": "text/html"}; body);
