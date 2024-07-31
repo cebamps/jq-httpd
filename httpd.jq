@@ -45,7 +45,12 @@ def response(code; reason; headers; body):
 def html(code; reason; body): response(code; reason; {"content-type": "text/html"}; body);
 def html(code; body): html(code; ""; body);
 
-def notfound: html(404; "not found"; "<html><body>not found. <a href=\"/\">go home</a>.</body></html>");
+def notfound: html(404; "not found"; "
+  <html>
+  <head><title>jq httpd demo - 404</title></head>
+  <body>not found. <a href=\"/\">go home</a>.</body>
+  </html>
+");
 
 def escapehtml:
   gsub("&"; "&amp;")
@@ -56,6 +61,7 @@ def escapehtml:
 serve(inputs;
   if .path == "/" then html(200; "
       <html>
+        <head><title>jq httpd demo - homepage</title></head>
         <body>
           <h1>Hello, world!</h1>
           <p>This is jq speaking. Yes. Seriously.</p>
@@ -70,13 +76,13 @@ serve(inputs;
             <script>(/*the irony*/ (e)=>e.innerText=JSON.stringify(JSON.parse(e.innerText),null,2))(document.getElementById(\"req\"))</script>
           </details>
           <p>If you want to know what time it is, go to the <a href=\"/time\">dedicated page</a>
-
           <style>pre{margin-left: 3em;}</style>
         </body>
       </html>
     ")
   elif .path == "/time" then html(200; "
       <html>
+        <head><title>jq httpd demo - time</title></head>
         <body>
           <p>The current time is \(now | todate)</p>
         </body>
