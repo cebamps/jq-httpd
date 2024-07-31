@@ -6,12 +6,11 @@ def next_phase: .phase |= {
 }[.];
 
 def ingest_verb($l):
-  . + (
+  next_phase + (
     $l
     | split(" ")
     | {verb: .[0], path: .[1], version: .[2]}
   )
-  | next_phase
 ;
 
 def ingest_header($l):
@@ -36,14 +35,12 @@ def serve(lines; respond):
 ;
 
 def response(code; reason; headers; body):
-(
   "HTTP/2 \(code) \(reason)",
   (headers | to_entries[] | [.key, .value] | join(": ")),
   "",
   body
-) | sub("$"; "\r")
+  | sub("$"; "\r")
 ;
-def response(code; headers; body): response(code; ""; headers; body);
 
 def html(code; reason; body): response(code; reason; {"content-type": "text/html"}; body);
 def html(code; body): html(code; ""; body);
@@ -64,10 +61,17 @@ serve(inputs;
           <p>This is jq speaking. Yes. Seriously.</p>
           <details>
             <summary>here is my own source code</summary>
-            <pre style=\"margin-left:3em\"><code>\($self | escapehtml)</pre></code>
+            <pre><code>\($self | escapehtml)</pre></code>
           </details>
           <p>Your user agent is \(.headers["user-agent"])</p>
+          <details>
+            <summary>full parsed request</summary>
+            <pre><code id=\"req\">\(tojson)</pre></code>
+            <script>(/*the irony*/ (e)=>e.innerText=JSON.stringify(JSON.parse(e.innerText),null,2))(document.getElementById(\"req\"))</script>
+          </details>
           <p>If you want to know what time it is, go to the <a href=\"/time\">dedicated page</a>
+
+          <style>pre{margin-left: 3em;}</style>
         </body>
       </html>
     ")
