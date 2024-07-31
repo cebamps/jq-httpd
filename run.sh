@@ -37,5 +37,5 @@ run() {
   fi
 }
 
-echo "Starting up..." >&2
-run socat tcp4-listen:22222,bind=127.0.0.1,reuseaddr,fork system:'./httpd.jq'
+echo "Starting up on http://localhost:$PORT ..." >&2
+run socat tcp4-listen:$PORT,bind=127.0.0.1,reuseaddr,fork system:'./httpd.jq'
