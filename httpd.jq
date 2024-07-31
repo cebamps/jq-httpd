@@ -1,46 +1,39 @@
 #!/usr/bin/env -S jq -Rrnf --rawfile self httpd.jq
 
+def next_phase: .phase |= {
+  "verb": "header",
+  "header": "done"
+}[.];
+
 def ingest_verb($l):
-  (.phase = 1) + (
+  . + (
     $l
     | split(" ")
-    | { verb: .[0], path: .[1], version: .[2]}
-  );
+    | {verb: .[0], path: .[1], version: .[2]}
+  )
+  | next_phase
+;
 
 def ingest_header($l):
-  .headers += (
-    $l
-    | split(": ")
-    | {(.[0] | ascii_downcase): .[1]}
-  )
-;
-
-def finish:
-  .phase = "done"
-;
-
-def ingest($l):
-  if .phase == 0
-    then ingest_verb($l)
-  elif .phase == 1
-    then if $l != ""
-      then ingest_header($l)
-      else finish
-    end
+  if $l == ""
+    then next_phase
+    else .headers += (
+      $l
+      | split(": ")
+      | {(.[0] | ascii_downcase): .[1]}
+    )
   end
 ;
 
 def serve(lines; respond):
   foreach (lines | sub("\\r$"; "")) as $l (
-    {phase: 0};
-    ingest($l);
-    if .phase == "done"
-      then del(.phase) | (respond, halt)
-      else empty
-    end
+    {phase: "verb"};
+    if   .phase == "verb"   then ingest_verb($l)
+    elif .phase == "header" then ingest_header($l)
+    end;
+    select(.phase == "done") | del(.phase) | (respond, halt)
   )
 ;
-def serve(respond): serve(inputs; respond);
 
 def response(code; reason; headers; body):
 (
@@ -63,7 +56,7 @@ def escapehtml:
   | gsub("<"; "&lt;")
 ;
 
-serve(
+serve(inputs;
   if .path == "/" then html(200; "
       <html>
         <body>
