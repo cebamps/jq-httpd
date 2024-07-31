@@ -5,7 +5,7 @@ PORT=
 
 while (( $# > 0 )); do
   case $1 in
-    --dev)
+    --dev|-d)
       shift
       DEV=true
       ;;
@@ -13,6 +13,10 @@ while (( $# > 0 )); do
       shift
       PORT=$1
       shift
+      ;;
+    *)
+      echo "unexpected argument: $1" >&2
+      exit 1
       ;;
   esac
 done
@@ -26,7 +30,7 @@ elif ! [[ -x "./httpd.jq" ]]; then
 fi
 
 run() {
-  if $DEF; then
+  if $DEV; then
     echo './httpd.jq' | entr -r "$@"
   else
     "$@"
