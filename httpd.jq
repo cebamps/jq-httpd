@@ -1,14 +1,7 @@
 #!/usr/bin/env -S jq -Rrn --rawfile self httpd.jq -f
 
-def next_phase: .phase |= {
-  "request": "header",
-  "header": "done",
-  # note that we don't parse request bodies. though we could! we would have to
-  # count bytes to match the content-length header
-}[.];
-
 def ingest_request($l):
-  next_phase + (
+  (.phase = "header") + (
     $l
     | split(" ")
     | {method: .[0], path: .[1], version: .[2]}
@@ -17,7 +10,9 @@ def ingest_request($l):
 
 def ingest_header($l):
   if $l == ""
-    then next_phase
+    # note that we don't parse request bodies after the header. though we
+    # could! we would have to count bytes to match the content-length header
+    then .phase = "done"
     else .headers += (
       $l
       | split(": ")
