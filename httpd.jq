@@ -35,7 +35,7 @@ def serve(lines; respond):
 ;
 
 def response(code; reason; headers; body):
-  "HTTP/2 \(code) \(reason)",
+  "HTTP/1.1 \(code) \(reason)",
   (headers | to_entries[] | [.key, .value] | join(": ")),
   "",
   body
