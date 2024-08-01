@@ -1,15 +1,17 @@
 #!/usr/bin/env -S jq -Rrn --rawfile self httpd.jq -f
 
 def next_phase: .phase |= {
-  "verb": "header",
-  "header": "done"
+  "request": "header",
+  "header": "done",
+  # note that we don't parse request bodies. though we could! we would have to
+  # count bytes to match the content-length header
 }[.];
 
-def ingest_verb($l):
+def ingest_request($l):
   next_phase + (
     $l
     | split(" ")
-    | {verb: .[0], path: .[1], version: .[2]}
+    | {method: .[0], path: .[1], version: .[2]}
   )
 ;
 
@@ -26,9 +28,9 @@ def ingest_header($l):
 
 def serve(lines; respond):
   foreach (lines | sub("\\r$"; "")) as $l (
-    {phase: "verb"};
-    if   .phase == "verb"   then ingest_verb($l)
-    elif .phase == "header" then ingest_header($l)
+    {phase: "request"};
+    if   .phase == "request" then ingest_request($l)
+    elif .phase == "header"  then ingest_header($l)
     end;
     select(.phase == "done") | del(.phase) | (respond, halt)
   )
