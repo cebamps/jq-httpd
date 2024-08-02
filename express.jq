@@ -1,4 +1,4 @@
-#!/usr/bin/env -S jq -Rrn --rawfile self httpd.jq -f
+#!/usr/bin/env -S jq -Rrn --rawfile self express.jq -f
 
 def ingest_request($l):
   (.phase = "header") + (
@@ -44,7 +44,7 @@ def html(code; body): html(code; ""; body);
 
 def notfound: html(404; "not found"; "
   <html>
-  <head><title>jq httpd demo - 404</title></head>
+  <head><title>Express.jq - 404</title></head>
   <body>not found. <a href=\"/\">go home</a>.</body>
   </html>
 ");
@@ -58,7 +58,7 @@ def escapehtml:
 serve(inputs;
   if .path == "/" then html(200; "
       <html>
-        <head><title>jq httpd demo - homepage</title></head>
+        <head><title>Express.jq - homepage</title></head>
         <body>
           <h1>Hello, world!</h1>
           <p>This is jq speaking. Yes. Seriously.</p>
@@ -79,7 +79,7 @@ serve(inputs;
     ")
   elif .path == "/time" then html(200; "
       <html>
-        <head><title>jq httpd demo - time</title></head>
+        <head><title>Express.jq - time</title></head>
         <body>
           <p>The current time is \(now | todate)</p>
         </body>
