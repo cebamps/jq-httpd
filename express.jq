@@ -70,7 +70,7 @@ serve(inputs;
           <details>
             <summary>full parsed request</summary>
             <pre><code id=\"req\">\(tojson)</pre></code>
-            <script>(/*the irony*/ (e)=>e.innerText=JSON.stringify(JSON.parse(e.innerText),null,2))(document.getElementById(\"req\"))</script>
+            <script>(/*the irony*/ (e)=>e.textContent=JSON.stringify(JSON.parse(e.textContent),null,2))(document.getElementById(\"req\"))</script>
           </details>
           <p>If you want to know what time it is, go to the <a href=\"/time\">dedicated page</a>
           <style>pre{margin-left: 3em;}</style>
