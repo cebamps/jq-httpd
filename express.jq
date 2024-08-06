@@ -66,10 +66,10 @@ serve(inputs;
             <summary>here is my own source code</summary>
             <pre><code>\($self | escapehtml)</pre></code>
           </details>
-          <p>Your user agent is \(.headers["user-agent"])</p>
+          <p>Your user agent is \(.headers["user-agent"] | escapehtml)</p>
           <details>
             <summary>full parsed request</summary>
-            <pre><code id=\"req\">\(tojson)</pre></code>
+            <pre><code id=\"req\">\(tojson | escapehtml)</pre></code>
             <script>(/*the irony*/ (e)=>e.textContent=JSON.stringify(JSON.parse(e.textContent),null,2))(document.getElementById(\"req\"))</script>
           </details>
           <p>If you want to know what time it is, go to the <a href=\"/time\">dedicated page</a>
